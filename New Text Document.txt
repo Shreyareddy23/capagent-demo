@@ -136,3 +136,72 @@ volumes:
   mongo_data:
   mysql_data:
   postgres_data:
+
+
+
+
+
+
+version: "3.9"
+
+services:
+  app:
+    image: your-dockerhub-username/your-java-app:latest
+    container_name: java_app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/testdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: userpass
+      SPRING_DATA_MONGODB_URI: mongodb://root:rootpass@mongo_db:27017
+      SPRING_DATASOURCE_POSTGRES_URL: jdbc:postgresql://postgres_db:5432/testdb
+      SPRING_DATASOURCE_POSTGRES_USERNAME: user
+      SPRING_DATASOURCE_POSTGRES_PASSWORD: userpass
+    depends_on:
+      - mysql
+      - postgres
+      - mongo
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: userpass
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mysql_data:
+  postgres_data:
+  mongo_data:
+
